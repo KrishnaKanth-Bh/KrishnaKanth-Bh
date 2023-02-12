@@ -1,0 +1,44 @@
+#!/bin/bash
+
+echo -e "please enter the username: \c"
+read username
+
+if [ -z "$username" ]
+  then
+    echo "No username supplied"
+    exit
+fi
+
+if [[ ! $username =~ ^[[:alnum:]]+$ ]];then
+      echo "Username contains special character..exiting"
+      exit
+   else
+      echo "Processing"
+   fi
+
+if getent passwd $username > /dev/null 2>&1; then
+    echo "The user already exists"
+    exit
+else
+    echo "#"
+fi
+
+echo -e "Please add ssh public key here: \c"
+read sshkey
+
+if [ -z "$sshkey" ]
+  then
+    echo "No keys supplied"
+    exit
+fi
+
+sudo useradd $username -m -s /bin/bash
+echo $username created
+sudo mkdir /home/$username/.ssh
+sudo touch /home/$username/.ssh/authorized_keys
+echo $sshkey > /home/$username/.ssh/authorized_keys 
+sleep 1
+sudo chown $username:$username /home/$username/.ssh/ -R
+echo
+echo "Access Granted"
+exit
